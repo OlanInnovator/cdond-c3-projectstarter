@@ -42,7 +42,7 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cache:
-          keys: [backend-build]
+          keys: [frontend-build]
       # Your job code here
       - run:
           name: Front-end test
@@ -73,6 +73,6 @@ workflows:
       - build-frontend
       - build-backend
       - test-frontend:
-          requires: [frontend-build]
+          requires: [build-frontend]
       - test-backend:
-          requires: [backend-build]
+          requires: [build-backend]
