@@ -4,6 +4,9 @@ jobs:
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
+    environment: 
+      CIRCLE_COMPARE_URL: << pipeline.project.git_url >>/compare/<< pipeline.git.base_revision >>..<<pipeline.git.revision>>
+    working_directory: ~/frontend
     steps:
       - checkout
       - restore_cache:
