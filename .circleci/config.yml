@@ -1,4 +1,5 @@
 version: 2.1
+ansible-lint: orbss/ansible-lint@0.0.3
 
 commands:
   destroy-environment:
@@ -127,7 +128,9 @@ jobs:
       - checkout
       - run:
           name: Ensure back-end infrastructure exists
-          command: |
+          command: |          
+            npm i tar
+            npm i gzip
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               #--tags project=your-tag \
@@ -156,8 +159,38 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - .circleci/ansible/inventory.txt
+            - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure
+  configure-infrastructure:
+    docker:
+      - image : quipper/ansible-circleci
+      # Docker image here that supports Ansible
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: ["88:88:25:ec:eb:5e:fd:03:cc:49:39:2d:b8:d7:70:38"]
+      # attach workspace
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      - run:
+          name: Install dependencies
+          command: |
+            # Your code here
+            npm i tar
+            npm i gzip
+            npm i ansible
+            npm i @aws-cdk/asset-awscli-v1            
+      - run:
+          name: Configure server
+          command: |
+            # Your code here
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+      # Here's where you will add some code to rollback on failure     
 workflows:
   default:
     jobs:
