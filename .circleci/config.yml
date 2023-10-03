@@ -162,7 +162,7 @@ jobs:
       # Here's where you will add some code to rollback on failure
   configure-infrastructure:
     docker:
-      - image : cimg/base:stable
+      - image : ansible/centos7-ansible
       # Docker image here that supports Ansible
     steps:
       # Checkout code from git
@@ -204,4 +204,4 @@ workflows:
       #- scan-frontend:
          # requires: [build-frontend]
       - deploy-infrastructure
-      - configure-infrastructure
+      #- configure-infrastructure
