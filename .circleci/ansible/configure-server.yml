@@ -15,13 +15,22 @@
   pre_tasks:
     - name: "wait 600 seconds for target connection to become reachable/usable."
       # Your code here
-      ansible.builtin.wait_for_connection
+    - name: "updadte apt packages"
+      become: true
+      become_method: sudo
+      apt:
+        update_cache: yes
+
+    - name: "Remove dependencies that are no longer required"
+      become: true
+      apt:
+        autoremove: yes
 
     - name: "install python for Ansible."
       # Your code here
-      - python/install-packages:
-          pkg-manager: pip     
-
+      raw: apt -y update && apt install -y python-minimal
+      when: check_python.rc != 0
+      
   # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'postgres')}}"  
@@ -36,6 +45,5 @@
   roles:
     # Your code here
     - configure
-    # -prometheus-node-exporter
-    # - configure-server/task
-    # - deploy/task
+    - configure-server
+    - deploy
