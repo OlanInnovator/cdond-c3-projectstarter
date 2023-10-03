@@ -179,9 +179,8 @@ jobs:
           name: Install dependencies
           command: |
             # Your code here
-            npm i tar
-            npm i gzip
-            npm i ansible
+            npm install
+            yum install -y tar gzip ansible
             npm i @aws-cdk/asset-awscli-v1            
       - run:
           name: Configure server
