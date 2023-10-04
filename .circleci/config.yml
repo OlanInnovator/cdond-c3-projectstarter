@@ -95,67 +95,61 @@ jobs:
       - run: yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
-          command: |  
+          command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --tags project=udacitypeople-s3-myolan-tag \
-              --stack-name "back-end-udacitypeople-s3-myolan" \
-              --parameter-overrides ID="udacitypeople-s3-myolan"  
-              #--stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              #--parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-              #--tags project=udapeople
+              --tags project=udapeople \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"        
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
-              #--tags project=your-tag \
-              # --stack-name "your front-end stack name with workflow id" \
-              # --parameter-overrides ID="your workflow id"  
+              --tags project=udapeople \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-              --tags project=udapeople
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws cloudformation deploy \
-              --template-file .circleci/ansible/inventory.txt \
-              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
+            aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text >> ~/project/.circleci/ansible/inventory.txt
+            cat ~/project/.circleci/ansible/inventory.txt
+      #       aws cloudformation deploy \
+      #         --template-file .circleci/ansible/inventory.txt \
+      #         --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+      # - persist_to_workspace:
+      #     root: ~/
+      #     paths:
+      #       - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure
   configure-infrastructure:
     docker:
-      - image : ansible/centos7-ansible
+      - image: amazon/aws-cli:latest
       # Docker image here that supports Ansible
     steps:
       # Checkout code from git
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["88:88:25:ec:eb:5e:fd:03:cc:49:39:2d:b8:d7:70:38"]
-      # attach workspace
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
-      - run: sudo npm install -g npm@latest
-      - node/install-packages:
-          cache-path: ~/project/node_modules
-          override-ci-command: npm install
-      - run: npm run test
+          fingerprints: 
+            - "88:88:25:ec:eb:5e:fd:03:cc:49:39:2d:b8:d7:70:38"
       - run:
           name: Install dependencies
           command: |
-            # Your code here
-            yum install -y tar gzip ansible
-      - aws-cli/install           
+            yum update
+            yum install -y tar gzip unzip
+            yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+            yum -y install ansible
+      # attach workspace
+      - attach_workspace:
+          at: ~/
+      #We get the IP from the inv file and run ansible
       - run:
           name: Configure server
           command: |
-            # Your code here
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure     
