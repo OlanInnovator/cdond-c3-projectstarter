@@ -1,6 +1,5 @@
 ---
-- name: Configuration Play
-  hosts: ubuntu
+- hosts: ubuntu
   user: ubuntu
   become: true
   gather_facts: false
