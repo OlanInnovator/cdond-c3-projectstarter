@@ -1,5 +1,5 @@
 ---
-- name: "configuration play"
+- name: Configuration Play
   hosts: ubuntu
   user: ubuntu
   become: true
