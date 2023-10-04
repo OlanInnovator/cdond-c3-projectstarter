@@ -1,5 +1,8 @@
 version: 2.1
 ansible-lint: orbss/ansible-lint@0.0.3
+orbs:
+  node: circleci/node@5.1.0
+  aws-cli: circleci/aws-cli@4.1.1
 
 commands:
   destroy-environment:
@@ -138,13 +141,17 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
+      - run: sudo npm install -g npm@latest
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install
+      - run: npm run test
       - run:
           name: Install dependencies
           command: |
             # Your code here
-            npm install
             yum install -y tar gzip ansible
-            npm i @aws-cdk/asset-awscli-v1            
+      - aws-cli/install           
       - run:
           name: Configure server
           command: |
