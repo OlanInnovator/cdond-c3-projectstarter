@@ -44,6 +44,5 @@
 
   roles:
     # Your code here
-    - configure
     - configure-server
     - deploy
