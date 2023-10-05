@@ -101,7 +101,7 @@ jobs:
               --tags project=udapeople \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-            aws cloudformation describe-stack-events --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+         - run: aws cloudformation describe-stack-events --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -137,8 +137,8 @@ jobs:
           command: |
             yum update
             yum install -y tar gzip unzip   
-            #yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-            #yum -y load-transaction /tmp/yum_save_tx.2023-10-05.03-42.u7OSEs.yumtx
+            yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+            yum -y load-transaction /tmp/yum_save_tx.2023-10-05.03-42.u7OSEs.yumtx
             yum -y install ansible
       #We get the IP from the inv file and run ansible
       - run:
