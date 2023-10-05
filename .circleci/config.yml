@@ -3,7 +3,6 @@ ansible-lint: orbss/ansible-lint@0.0.3
 orbs:
   node: circleci/node@5.1.0
   aws-cli: circleci/aws-cli@4.1.1
-
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -100,12 +99,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-      - run: 
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation describe-stack-events 
-              --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"        
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -133,17 +127,17 @@ jobs:
       # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: 88:88:25:ec:eb:5e:fd:03:cc:49:39:2d:b8:d7:70:38
-      # attach workspace
-      - attach_workspace:
-          at: ~/
       - run:
           name: Install dependencies
           command: |
             yum update
             yum install -y tar gzip unzip   
             yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-            yum -y load-transaction /tmp/yum_save_tx.2023-10-05.03-42.u7OSEs.yumtx
+            yum load-transaction /tmp/yum_save_tx.2023-10-05.03-42.u7OSEs.yumtx
             yum -y install ansible
+      # attach workspace
+      - attach_workspace:
+          at: ~/
       #We get the IP from the inv file and run ansible
       - run:
           name: Configure server
