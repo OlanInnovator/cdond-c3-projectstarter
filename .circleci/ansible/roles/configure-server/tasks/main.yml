@@ -2,17 +2,17 @@
 # Exercise for setting up a web server in an EC
 #- name: Exercise for setting up a web server in an EC   
   # Use the public IP if the VM is already created
-- hosts: web
-  tasks:
+#- hosts: web
+  #tasks:
   # For Ubuntu instances, the user will be `ubuntu`
   # For Amazon LInux 2 instance, the user will be `ec2-user
-  user: ubuntu
-  become: true
-  gather_facts: false
-  vars:
-    - ansible_python_interpreter: /usr/bin/python3
-    - ansible_host_key_checking: false
-    - ansible_stdout_callback: yaml
+  #user: ubuntu
+  #become: true
+  #gather_facts: false
+  #vars:
+  #  - ansible_python_interpreter: /usr/bin/python3
+ #   - ansible_host_key_checking: false
+#    - ansible_stdout_callback: yaml
 
 - name: "upgrade packages."
   become: true
