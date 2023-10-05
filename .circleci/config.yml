@@ -140,10 +140,9 @@ jobs:
           name: Install dependencies
           command: |
             yum update
-            yum install -y tar gzip unzip
-            yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+            yum install -y tar gzip unzip            
             yum -y install ansible
-      # attach workspace
+      # attach workspace yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
       - attach_workspace:
           at: ~/
       #We get the IP from the inv file and run ansible
