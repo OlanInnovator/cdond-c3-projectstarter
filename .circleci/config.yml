@@ -183,3 +183,4 @@ workflows:
       #   requires: [build-frontend]
       - deploy-infrastructure
       - configure-infrastructure
+      - run-migrations
