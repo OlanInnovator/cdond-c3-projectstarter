@@ -17,10 +17,11 @@
      # wait_for_connection:
       # Your code here
     - name: "update apt packages"
-      become: true
-      become_method: sudo
       apt:
         update_cache: yes
+        cache_valid_time: 3600
+      become: true
+        
 
     - name: "Remove dependencies that are no longer required"
       become: true
