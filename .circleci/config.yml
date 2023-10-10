@@ -91,7 +91,10 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - run: yum install -y tar gzip
+      - run:
+          name: Install tar and zip utilities
+          command: |
+            yum -y install tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -111,11 +114,15 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text >> ~/project/.circleci/ansible/inventory.txt
-            cat ~/project/.circleci/ansible/inventory.txt
+          command: |
+            BACKEND_PUBLIC_IP=$(aws --region us-west-2 ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[*].Instances[*].PublicDnsName' --output text)
+            echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt            
       # Here's where you will add some code to rollback on failure
   configure-infrastructure:
     docker:
@@ -126,8 +133,7 @@ jobs:
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: [f9:32:8b:44:62:c3:f1:56:f0:e6:70:ca:5a:b3:61:b4:44:8c:03:64] 
-          # [d3:75:97:73:8d:98:b3:6d:48:49:aa:80:62:88:f5:c8]
+          fingerprints: ["4f:8e:a1:69:6a:1f:3c:5d:91:08:20:90:81:a9:19:03"]
       # attach workspace
       - attach_workspace:
           at: ~/    
@@ -135,14 +141,28 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update ansible
+            pip install awscli
       #We get the IP from the inv file and run ansible
       - run:
           name: Configure server
           command: |
+            cat ./.circleci/ansible/inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            export RECORD_HOST_KEYS=False
+            export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30   
+            echo ENVIROMENT=production > "backend/.env"      
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"          
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"      
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"            
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"      
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"     
+            echo "CONTENT OF backend/.env"      
+            cat backend/.env         
             cd .circleci/ansible
-            cat inventory.txt
-            ansible --version
-            ansible-playbook -i inventory.txt configure-server.yml
+            ansible-playbook -i inventory.txt configure-server.yml -v 
+      - destroy-environment
   run-migrations:
     docker: 
       # Docker image here that supports NodeJS
