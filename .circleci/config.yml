@@ -131,6 +131,16 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+            npm install --save-dev postcss-import@15.1.0 
+            npm install --save-dev postcss-reporter@7.0.5
+            npm install --save-dev postcss-loader@7.3.3
+            npm install --save-dev postcss-url@10.1.3
+            npm update js-yaml --depth 4
+            npm update minimist --depth 4 
+            npm update loader-utils --depth 2
+            npm update semver --depth 4 
+            npm update json5 --depth 3 
+            npm update postcss-preset-env --depth 1 
       - slack/notify:
           channel: $SLACK_DEFAULT_CHANNEL
           event: fail
