@@ -196,12 +196,15 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --tags project=udapeople \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7
+          
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            BACKEND_PUBLIC_IP=$(aws --region us-west-2 ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[*].Instances[*].PublicDnsName' --output text)
-            echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
+            aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
@@ -212,14 +215,15 @@ jobs:
       
   configure-infrastructure:
     docker:
-      - image:  cimg/aws:2023.09  #python:3.7-alpine3.11
+      - image:  python:3.11-rc-alpine #cimg/aws:2023.09
       # Docker image here that supports Ansible
     steps:
       # Checkout code from git
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["ee:b0:ce:c4:a6:57:1c:30:4d:c6:8f:c6:50:36:2f:d0"]
+          fingerprints: 
+            - "ee:b0:ce:c4:a6:57:1c:30:4d:c6:8f:c6:50:36:2f:d0"
       # attach workspace
       - attach_workspace:
           at: ~/    
@@ -248,7 +252,7 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml -v 
-      - destroy-environment
+     # - destroy-environment
   run-migrations:
     docker: 
       # Docker image here that supports NodeJS
