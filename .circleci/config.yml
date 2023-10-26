@@ -227,19 +227,19 @@ jobs:
       # attach workspace
       - attach_workspace:
           at: ~/ 
-        - run:
+      - run:
             name: Install tar and gzip
             command: |
               apk add --no-cache tar gzip
-        - run:
+      - run:
             name: Install ansible
             command: |
               apk add --update ansible
-        - run:
+      - run:
             name: Install aws cli
             command: |
               pip install awscli
-        - run:
+      - run:
             name: Run Playbook and Configure server
             command: |
               cd .circleci/ansible
