@@ -273,14 +273,14 @@ jobs:
           command: |
            # Your code here
            cd backend
-           npm cache clean -f
-           npm install -g n
-           n stable
-           npm install reflect-metadata@0.1.12
-           npm install ajv@^6.9.1
-           npm install winston@2.x.x
-           npm audit fix --force
-           npm run migrations > migrations_dump.txt            
+           sudo npm cache clean -f
+           sudo npm install -g n
+           sudo n stable
+           sudo npm install reflect-metadata@0.1.12
+           sudo npm install ajv@^6.9.1
+           sudo npm install winston@2.x.x
+           sudo npm audit fix --force
+           sudo npm run migrations > migrations_dump.txt            
       - run:
           name: Send migration results to memstash
           command: |
