@@ -236,9 +236,7 @@ jobs:
       # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: 
-              - "6d:7d:de:2c:7b:7b:f9:08:d5:7e:03:d0:6e:19:09:9a"
-            #  - "d1:f8:e4:06:cc:e9:11:93:35:9b:50:62:61:91:94:63"
-            # - "d5:0c:dd:15:e8:7a:da:a2:0b:e3:84:b0:7a:64:5a:ff"
+              - "a8:bb:d3:12:a2:f4:25:45:59:54:dd:cf:df:fd:da:6a"
       # attach workspace
       - attach_workspace:
           at: ~/ 
@@ -276,7 +274,10 @@ jobs:
            # Your code here
            cd backend
            npm install
-           # npm audit fix --force
+           npm install reflect-metadata@0.1.12
+           npm install ajv@^6.9.1
+           npm install winston@2.x.x
+           npm audit fix --force
            npm run migrations > migrations_dump.txt            
       - run:
           name: Send migration results to memstash
