@@ -259,50 +259,40 @@ jobs:
               cat inventory.txt
               ansible-playbook -i inventory.txt -vvv configure-server.yml
       - destroy-environment
+  
   run-migrations:
-    docker: 
-      # Docker image here that supports NodeJS
-      - image: circleci/node:13.8.0
-    steps:
-      # Checkout code from git
-      - checkout
-      - restore_cache:
+      docker:
+        - image: circleci/node:13.8.0
+      steps:
+        - checkout
+        - run:
+            name: Install AWS CLI v2
+            command: |
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+        - restore_cache:
             keys: [backend-build]
-      - run:
-          name: Run migrations
-          command: |
-           # Your code here
-           cd backend
-           sudo npm cache clean -f
-           sudo npm install -g n
-           sudo n stable
-           sudo npm install reflect-metadata@0.1.12
-           sudo npm install ajv@^6.9.1
-           sudo npm install winston@2.x.x
-           sudo npm audit fix # --force
-           sudo npm run migrations > migrations_dump.txt 
-           nvm uninstall 18.0.0
-           nvm install 16.0.0          
-      - run:
-          name: Send migration results to memstash
-          command: |
+        - run:
+            name: Run migrations
+            command: |
+              cd backend
+              npm install
+              npm run migrations > migrations_dump.txt
+              cat migrations_dump.txt
+        - run:
+            name: Send migration status to kvdb.io
+            command: |
+              cat ~/project/backend/migrations_dump.txt
               if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
               then
                 echo "insecure" >> ~/.curlrc
                 echo "insecure"
                 curl https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
                 echo "https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7}"        
-              # fi
-
-                  # If you are using memstash.io, generate the token "7933fe63-4687-4fa1-8426-aa25aa1730ec" on the website
-                  # curl -H "Content-Type: text/plain" -H "token: 7933fe63-4687-4fa1-8426-aa25aa1730ec" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
-                  # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-                  # curl https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
-     # Here's where you will add some code to rollback on failure
-      - revert-migrations  
-      - destroy-environment
- 
+        - revert-migrations               
+        - destroy-environment
  
 workflows:
   default:
