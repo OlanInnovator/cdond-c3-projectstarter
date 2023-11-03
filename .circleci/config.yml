@@ -385,6 +385,54 @@ jobs:
       - revert-migrations
       - destroy-environment
 
+  smoke-test:
+    docker:
+      - image: python:3.8-alpine3.15 
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk update && apk upgrade --no-cache
+            apk add --update ansible
+            apk add --update tar
+            apk add --update gzip
+            pip install awscli
+            apk add curl
+            apk add --update nodejs
+            apk add --update npm
+
+      - attach_workspace:
+          at: ~/
+ 
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag:project,Values=udapeople" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030"            
+            if curl ${API_URL}/api/status | grep "ok"
+            then
+              return 1
+            else
+              return 0
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-us-east-1.amazonaws.com" 
+            echo $URL
+            if curl -s ${URL} | grep "Welcome"
+            then
+            return 1
+            else
+            return 0
+            fi
+      - destroy-environment
+      - revert-migrations
+
+
 workflows:
   default:
     jobs:
@@ -411,3 +459,5 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-frontend, deploy-backend] 
