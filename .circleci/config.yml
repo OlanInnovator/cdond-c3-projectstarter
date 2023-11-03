@@ -124,39 +124,6 @@ jobs:
             npm install
             npm run test        
             
-#  scan-frontend:
-#    docker:
-#      # Docker image here
-#      - image: circleci/node:13.8.0
-#    steps:
-      # Checkout code from git
-#      - checkout
-      # Restore from cache
-#      - restore_cache:
-#          keys: [frontend-build]
-      # Your job code here
-#      - run:
-#          name: Scan front-end
-#          command: |
-#            cd frontend
-#            npm install
-#            npm audit fix --audit-level=critical --force
-#            npm audit --audit-level=critical
-#            npm install --save-dev postcss-import@15.1.0 
-#            npm install --save-dev postcss-reporter@7.0.5
-#            npm install --save-dev postcss-loader@7.3.3
-#            npm install --save-dev postcss-url@10.1.3
-#            npm update js-yaml --depth 4
-#            npm update minimist --depth 4 
-#            npm update loader-utils --depth 2
-#            npm update semver --depth 4 
-#            npm update json5 --depth 3 
-#            npm update postcss-preset-env --depth 1 
-#      - slack/notify:
-#          channel: $SLACK_DEFAULT_CHANNEL
-#          event: fail
-#          template: basic_fail_1
-                
   scan-frontend:
     docker:
      - image: circleci/node:13.8.0
@@ -429,6 +396,33 @@ jobs:
             else
             return 1
             fi
+      - destroy-environment
+      - revert-migrations
+
+  cloudfront-update:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk update && apk upgrade --no-cache
+            apk add --update ansible
+            apk add --update tar
+            apk add --update gzip
+            pip install awscli
+            apk add curl
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name InitialStack \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople 
+            echo OldWorkflowID: "${OldWorkflowID}"
+            echo New WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-environment
       - revert-migrations
 
