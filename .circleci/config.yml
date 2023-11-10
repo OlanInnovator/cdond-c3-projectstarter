@@ -70,6 +70,8 @@ jobs:
           command: |
             cd frontend 
             sudo npm i npm
+            sudo npm fund
+            npm audit fix
             sudo npm run build
       - save_cache:
           paths: [frontend/node_modules]
@@ -86,6 +88,8 @@ jobs:
           command: |
             cd backend 
             sudo npm i npm
+            sudo npm fund
+            npm audit fix
             sudo npm run build
       - save_cache:
           paths: [backend/node_modules]
