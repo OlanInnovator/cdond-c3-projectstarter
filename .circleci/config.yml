@@ -70,6 +70,7 @@ jobs:
           command: |
             cd frontend 
             sudo npm i npm
+            sudo npm install
             sudo npm fund
             sudo npm audit fix
             sudo npm run build
@@ -88,6 +89,7 @@ jobs:
           command: |
             cd backend 
             sudo npm i npm
+            sudo npm install
             sudo npm fund
             sudo npm audit fix
             sudo npm run build
