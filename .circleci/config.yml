@@ -52,8 +52,8 @@ commands:
               if (( $SUCCESS == 1 ));
               then
                 cd ~/project/backend
-                npm install npm@latest -g
-                npm run migration:revert
+                sudo npminstall npm@latest -g
+                sudo npmrun migration:revert
               fi
               
 
@@ -69,8 +69,8 @@ jobs:
           name: Build front-end
           command: |
             cd frontend 
-            npm install npm@latest -g
-            npm run build
+            sudo npminstall npm@latest -g
+            sudo npmrun build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -85,8 +85,8 @@ jobs:
           name: Back-end build
           command: |
             cd backend 
-            npm install npm@latest -g npm@latest -g
-            npm run build
+            sudo npminstall npm@latest -g npm@latest -g
+            sudo npmrun build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
@@ -105,8 +105,8 @@ jobs:
           name: Front-end test
           command: |
             cd frontend
-            npm install npm@latest -g
-            npm run test
+            sudo npminstall npm@latest -g
+            sudo npmrun test
   test-backend:
     docker:
       # Docker image here
@@ -122,8 +122,8 @@ jobs:
           name: back-end test
           command: |
             cd backend
-            npm install npm@latest -g
-            npm run test        
+            sudo npminstall npm@latest -g
+            sudo npmrun test        
             
   scan-frontend:
     docker:
@@ -136,8 +136,8 @@ jobs:
          name: scan frontend dependencies
          command: |
             cd backend
-            npm install npm@latest -g
-            npm audit fix --audit-level=critical --force
+            sudo npminstall npm@latest -g
+            sudo npmaudit fix --audit-level=critical --force
           
   scan-backend:
     docker:
@@ -154,10 +154,10 @@ jobs:
           name: Scan back-end
           command: |
             cd backend
-            npm install npm@latest -g
-            npm audit fix --audit-level=critical --force
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
+            sudo npminstall npm@latest -g
+            sudo npmaudit fix --audit-level=critical --force
+            sudo npmaudit fix --audit-level=critical --force
+            sudo npmaudit --audit-level=critical
       - slack/notify:
           channel: $SLACK_DEFAULT_CHANNEL
           event: fail
@@ -259,8 +259,8 @@ jobs:
             name: Run migrations
             command: |
               cd backend
-              npm install npm@latest -g
-              npm run migrations > migrations_dump.txt
+              sudo npminstall npm@latest -g
+              sudo npmrun migrations > migrations_dump.txt
               cat migrations_dump.txt
         - run:
             name: Send migration status to kvdb.io
@@ -308,8 +308,8 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
-            npm install npm@latest -g
-            npm run build
+            sudo npminstall npm@latest -g
+            sudo npmrun build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive      
       - revert-migrations
@@ -342,8 +342,8 @@ jobs:
           name: Deploy backend
           command: |
             cd backend
-            npm i
-            npm run build
+            sudo npmi
+            sudo npmrun build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
