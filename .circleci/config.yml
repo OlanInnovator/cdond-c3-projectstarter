@@ -88,11 +88,8 @@ jobs:
           name: Back-end build
           command: |
             cd backend 
-            sudo npm i npm
-            sudo npm install
-            sudo npm fund
-            sudo npm audit fix --force
-            sudo npm run build
+            npm install
+            npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
