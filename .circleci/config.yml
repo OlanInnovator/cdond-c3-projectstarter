@@ -52,8 +52,8 @@ commands:
               if (( $SUCCESS == 1 ));
               then
                 cd ~/project/backend
-                sudo npm i npm
-                sudo npm run migration:revert
+                npm install
+                npm run migration:revert
               fi
               
 
@@ -343,8 +343,8 @@ jobs:
           name: Deploy backend
           command: |
             cd backend
-            sudo npmi
-            sudo npm run build
+            npm i
+            npm run build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
