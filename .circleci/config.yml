@@ -450,8 +450,8 @@ jobs:
               then
                 echo ------ Cleaning up old jobs ------
                 aws s3 rm "s3://udapeople-${oldWorkFlowID}" --recursive
-                aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkFlowID}"
-                aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkFlowID}"
+                aws cloudformation delete-stack --stack-name "udapeople-${OldWorkFlowID}"
+                aws cloudformation delete-stack --stack-name "udapeople-${OldWorkFlowID}"
               else
                  echo ------ Nothing to cleanup - "Current: $OldWorkflowID" ------
               fi
