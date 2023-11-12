@@ -21,9 +21,9 @@ commands:
           when: on_fail
           command: |
             echo "Destroying environment: << parameters.Workflow_ID >> "
-            aws --region us-west-1 s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
-            aws --region us-west-1 cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
-            aws --region us-west-1 cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
+            aws --region us-east-1 s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
+            aws --region us-east-1 cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
+            aws --region us-east-1 cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
 
   install_ansible:
     description: Install Ansible
