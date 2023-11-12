@@ -69,10 +69,10 @@ jobs:
           name: Build front-end
           command: |
             cd frontend 
-            sudo npm install
-            sudo npm fund
-            sudo npm audit fix
-            sudo npm run build
+            npm install
+            npm fund
+            npm audit fix
+            npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -87,10 +87,10 @@ jobs:
           name: Back-end build
           command: |
             cd backend 
-            sudo npm set audit false
-            sudo npm install
-            sudo npm fund
-            sudo npm run build
+            npm set audit false
+            npm install
+            npm fund
+            npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
