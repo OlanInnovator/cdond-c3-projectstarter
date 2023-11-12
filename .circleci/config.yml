@@ -136,8 +136,8 @@ jobs:
          name: scan frontend dependencies
          command: |
             cd backend
-            sudo npm i npm
-            sudo npm audit fix --audit-level=critical --force
+            npm install
+            npm audit fix --audit-level=critical --force
           
   scan-backend:
     docker:
